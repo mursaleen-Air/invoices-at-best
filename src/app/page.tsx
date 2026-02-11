@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import StructuredData from "@/components/StructuredData";
 import { generateSoftwareApplicationSchema } from "@/lib/seo";
+import TemplateCarousel from "@/components/TemplateCarousel";
 
 export const metadata: Metadata = {
     title: "Invoices at Best — The Ultimate Free Invoice Generator",
@@ -96,7 +97,7 @@ export default function Home() {
                         <Link href="/invoice" className="btn-primary text-lg px-10 py-4 shadow-xl shadow-indigo-500/30">
                             Create First Invoice
                         </Link>
-                        <Link href="/signup" className="text-slate-600 font-semibold hover:text-indigo-600 transition-colors px-6 py-3">
+                        <Link href="/invoice-templates" className="text-slate-600 font-semibold hover:text-indigo-600 transition-colors px-6 py-3">
                             View Templates →
                         </Link>
                     </div>
@@ -137,6 +138,9 @@ export default function Home() {
                         </Link>
                     ))}
                 </div>
+
+                {/* Template Carousel */}
+                <TemplateCarousel />
 
                 {/* Value Props */}
                 <div className="bg-slate-900 rounded-3xl p-8 md:p-16 text-white relative overflow-hidden mb-24 shadow-2xl">

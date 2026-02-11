@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb, degrees } from "pdf-lib";
 import { DocumentPayload, DOCUMENT_CONFIG } from "@/types/invoice";
+import { getTemplate } from "@/lib/templates";
 
 export async function generateDocumentPDF(
     document: DocumentPayload,
@@ -13,14 +14,17 @@ export async function generateDocumentPDF(
 
     const { width, height } = page.getSize();
     const config = DOCUMENT_CONFIG[document.documentType];
+    const template = getTemplate(document.templateId || "simple");
+    const tplStyle = template.style;
 
     // Apply watermark ONLY if NOT premium
     if (!isPremium) {
         await addWatermark(page, helveticaBold, width, height, config.watermark);
     }
 
-    // Colors
-    const primaryColor = rgb(config.color.r, config.color.g, config.color.b);
+    // Colors — use template colors instead of document type colors
+    const primaryColor = rgb(tplStyle.headerColor.r, tplStyle.headerColor.g, tplStyle.headerColor.b);
+    const accentColor = rgb(tplStyle.accentColor.r, tplStyle.accentColor.g, tplStyle.accentColor.b);
     const textColor = rgb(0.11, 0.11, 0.11);
     const lightGray = rgb(0.4, 0.4, 0.4);
     const tableHeaderBg = primaryColor;
@@ -29,14 +33,79 @@ export async function generateDocumentPDF(
     let y = height - 50;
     const margin = 50;
 
-    // --- HEADER ---
-    page.drawText(config.title, {
-        x: margin,
-        y: y,
-        size: 28,
-        font: helveticaBold,
-        color: primaryColor,
-    });
+    // --- TEMPLATE: Header background fill ---
+    if (tplStyle.headerBgFill) {
+        page.drawRectangle({
+            x: 0,
+            y: height - 80,
+            width: width,
+            height: 80,
+            color: primaryColor,
+        });
+    }
+
+    // --- TEMPLATE: Accent line at top ---
+    if (tplStyle.showAccentLine) {
+        page.drawRectangle({
+            x: 0,
+            y: height - 4,
+            width: width,
+            height: 4,
+            color: accentColor,
+        });
+    }
+
+    // --- LOGO ---
+    if (document.logoBase64) {
+        try {
+            const base64Data = document.logoBase64.split(",")[1];
+            const logoBytes = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+            let logoImage;
+            if (document.logoBase64.includes("image/png")) {
+                logoImage = await pdfDoc.embedPng(logoBytes);
+            } else {
+                logoImage = await pdfDoc.embedJpg(logoBytes);
+            }
+            const logoDims = logoImage.scale(1);
+            const maxLogoH = 40;
+            const maxLogoW = 120;
+            const scale = Math.min(maxLogoW / logoDims.width, maxLogoH / logoDims.height, 1);
+            const logoW = logoDims.width * scale;
+            const logoH = logoDims.height * scale;
+            page.drawImage(logoImage, {
+                x: margin,
+                y: height - 50 - logoH + 10,
+                width: logoW,
+                height: logoH,
+            });
+            // Shift title to the right of logo
+            page.drawText(config.title, {
+                x: margin + logoW + 15,
+                y: y,
+                size: 28,
+                font: helveticaBold,
+                color: tplStyle.headerBgFill ? rgb(1, 1, 1) : primaryColor,
+            });
+        } catch {
+            // Fallback: draw title without logo if embedding fails
+            page.drawText(config.title, {
+                x: margin,
+                y: y,
+                size: 28,
+                font: helveticaBold,
+                color: tplStyle.headerBgFill ? rgb(1, 1, 1) : primaryColor,
+            });
+        }
+    } else {
+        // --- HEADER (no logo) ---
+        page.drawText(config.title, {
+            x: margin,
+            y: y,
+            size: 28,
+            font: helveticaBold,
+            color: tplStyle.headerBgFill ? rgb(1, 1, 1) : primaryColor,
+        });
+    }
 
     // Document Number & Dates (Right Aligned)
     const dateFontSize = 10;

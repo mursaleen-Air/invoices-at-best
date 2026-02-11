@@ -100,8 +100,8 @@ export default function BlogPage() {
                                     {/* Generative abstract gradient based on slug hash or index */}
                                     <div
                                         className={`absolute inset-0 bg-gradient-to-br ${idx % 3 === 0 ? "from-emerald-400 to-teal-600" :
-                                                idx % 3 === 1 ? "from-amber-400 to-orange-600" :
-                                                    "from-fuchsia-400 to-pink-600"
+                                            idx % 3 === 1 ? "from-amber-400 to-orange-600" :
+                                                "from-fuchsia-400 to-pink-600"
                                             } opacity-80 group-hover:scale-110 transition-transform duration-700`}
                                     />
                                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
@@ -137,7 +137,7 @@ export default function BlogPage() {
                     <div className="relative z-10 max-w-2xl mx-auto space-y-6">
                         <h2 className="text-3xl font-bold text-white">Join our newsletter</h2>
                         <p className="text-indigo-200">Get the latest invoicing tips and business growth guides delivered to your inbox.</p>
-                        <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
+                        <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto" action="#">
                             <input type="email" placeholder="Enter your email" className="px-6 py-3 rounded-xl flex-1 bg-white/10 border border-white/20 text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-white/50" />
                             <button className="px-8 py-3 bg-white text-indigo-900 font-bold rounded-xl hover:bg-indigo-50 transition-colors">Subscribe</button>
                         </form>

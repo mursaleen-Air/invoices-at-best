@@ -16,6 +16,8 @@ const commonFields = {
     items: z.array(lineItemSchema).min(1, "At least one item is required"),
     taxPercent: z.number().min(0).max(100),
     discount: z.number().min(0).optional(),
+    templateId: z.string().optional(),
+    logoBase64: z.string().optional(),
 };
 
 // Invoice (Strict)

@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, useRef, FormEvent, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { DocumentFormData, DocumentItem, DocumentType, DOCUMENT_CONFIG } from "@/types/invoice";
+import { INVOICE_TEMPLATES, getTemplate } from "@/lib/templates";
 
 function generateId(): string {
     return Math.random().toString(36).substring(2, 11);
@@ -21,8 +23,44 @@ interface DocumentFormProps {
     documentType: DocumentType;
 }
 
-export default function DocumentForm({ documentType }: DocumentFormProps) {
+function DocumentFormInner({ documentType }: DocumentFormProps) {
     const config = DOCUMENT_CONFIG[documentType];
+    const searchParams = useSearchParams();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const [selectedTemplate, setSelectedTemplate] = useState("simple");
+    const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+    // Read template from URL params
+    useEffect(() => {
+        const tplParam = searchParams.get("template");
+        if (tplParam) {
+            const found = INVOICE_TEMPLATES.find((t) => t.id === tplParam);
+            if (found) setSelectedTemplate(found.id);
+        }
+    }, [searchParams]);
+
+    const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 500 * 1024) {
+            setErrors((prev) => ({ ...prev, logo: "Logo must be under 500KB" }));
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const base64 = ev.target?.result as string;
+            setLogoPreview(base64);
+            setFormData((prev) => ({ ...prev, logoBase64: base64 }));
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const removeLogo = () => {
+        setLogoPreview(null);
+        setFormData((prev) => ({ ...prev, logoBase64: undefined }));
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
 
     const [formData, setFormData] = useState<DocumentFormData>({
         // Business
@@ -69,6 +107,7 @@ export default function DocumentForm({ documentType }: DocumentFormProps) {
         deliveryTerms: "",
 
         documentType: documentType,
+        templateId: "simple",
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -209,12 +248,13 @@ export default function DocumentForm({ documentType }: DocumentFormProps) {
         // --- End client-side validation ---
 
         try {
+            const payload = { ...formData, templateId: selectedTemplate };
             const response = await fetch("/api/invoice/generate-pdf", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
@@ -294,6 +334,79 @@ export default function DocumentForm({ documentType }: DocumentFormProps) {
                     {errors.general}
                 </div>
             )}
+
+            {/* Template & Logo Selector */}
+            <div className="glass-card">
+                <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
+                    Template & Branding
+                </h2>
+
+                {/* Template Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+                    {INVOICE_TEMPLATES.map((tpl) => (
+                        <button
+                            key={tpl.id}
+                            type="button"
+                            onClick={() => {
+                                setSelectedTemplate(tpl.id);
+                                setFormData((prev) => ({ ...prev, templateId: tpl.id }));
+                            }}
+                            className={`relative rounded-xl p-3 border-2 transition-all duration-200 text-left ${selectedTemplate === tpl.id
+                                ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200"
+                                : "border-slate-200 hover:border-slate-300 bg-white"
+                                }`}
+                        >
+                            {/* Badge */}
+                            <span className={`absolute -top-2 -right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${tpl.isPremium ? "bg-amber-400 text-amber-900" : "bg-emerald-400 text-emerald-900"
+                                }`}>
+                                {tpl.isPremium ? "PRO" : "FREE"}
+                            </span>
+
+                            {/* Mini preview */}
+                            <div className={`w-full h-16 bg-gradient-to-br ${tpl.previewGradient} rounded-lg mb-2 flex items-center justify-center`}>
+                                <div className="w-8 h-10 bg-white/90 rounded-sm shadow-sm" />
+                            </div>
+                            <p className="text-xs font-semibold text-slate-700 truncate">{tpl.name}</p>
+                        </button>
+                    ))}
+                </div>
+
+                {/* Logo Upload */}
+                <div className="border-t border-slate-100 pt-6">
+                    <label className="block text-sm font-medium text-slate-700 mb-3">Company Logo (Optional)</label>
+                    <div className="flex items-center gap-4">
+                        {logoPreview ? (
+                            <div className="relative w-20 h-20 rounded-xl border border-slate-200 overflow-hidden bg-white flex items-center justify-center">
+                                <img src={logoPreview} alt="Logo preview" className="max-w-full max-h-full object-contain p-1" />
+                                <button type="button" onClick={removeLogo} className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600">
+                                    ×
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-20 h-20 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors cursor-pointer"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <span className="text-[10px] mt-1">Upload</span>
+                            </button>
+                        )}
+                        <div className="text-xs text-slate-500">
+                            <p>PNG, JPG, or SVG.<br />Max 500KB. Will be placed in the PDF header.</p>
+                        </div>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/png,image/jpeg,image/svg+xml"
+                            onChange={handleLogoUpload}
+                            className="hidden"
+                        />
+                    </div>
+                    {errors.logo && <p className="text-red-500 text-xs mt-2">{errors.logo}</p>}
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* section: Business Info (All types) */}
@@ -635,5 +748,19 @@ function Input({
             />
             {error && <p className="mt-1 text-sm text-red-600 font-medium">{error}</p>}
         </div>
+    );
+}
+
+export default function DocumentForm({ documentType }: DocumentFormProps) {
+    return (
+        <Suspense fallback={
+            <div className="glass-card animate-pulse">
+                <div className="h-8 bg-slate-200 rounded w-1/3 mb-4" />
+                <div className="h-4 bg-slate-100 rounded w-2/3 mb-2" />
+                <div className="h-4 bg-slate-100 rounded w-1/2" />
+            </div>
+        }>
+            <DocumentFormInner documentType={documentType} />
+        </Suspense>
     );
 }

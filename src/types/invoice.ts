@@ -52,6 +52,8 @@ export interface DocumentFormData {
     deliveryTerms?: string;
 
     documentType: DocumentType;
+    templateId?: string;
+    logoBase64?: string;
 }
 
 export interface DocumentPayload {
@@ -97,6 +99,8 @@ export interface DocumentPayload {
     deliveryTerms?: string;
 
     documentType: DocumentType;
+    templateId?: string;
+    logoBase64?: string;
 }
 
 export interface ValidationError {
