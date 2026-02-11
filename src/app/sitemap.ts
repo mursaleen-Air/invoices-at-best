@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { getAllBlogSlugs } from "@/lib/blog-data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://invoicesatbest.com";
 
@@ -28,13 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         { path: "/terms", priority: 0.5, changeFrequency: "yearly" as const },
     ];
 
-    const blogSlugs = [
-        "how-to-create-professional-invoice",
-        "invoice-vs-receipt-differences",
-        "freelancer-invoicing-guide",
-        "small-business-billing-tips",
-        "proforma-invoice-explained",
-    ];
+    const blogSlugs = getAllBlogSlugs();
 
     const blogPages = blogSlugs.map((slug) => ({
         path: `/blog/${slug}`,
