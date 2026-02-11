@@ -31,14 +31,7 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
     const [selectedTemplate, setSelectedTemplate] = useState("simple");
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
-    // Read template from URL params
-    useEffect(() => {
-        const tplParam = searchParams.get("template");
-        if (tplParam) {
-            const found = INVOICE_TEMPLATES.find((t) => t.id === tplParam);
-            if (found) setSelectedTemplate(found.id);
-        }
-    }, [searchParams]);
+
 
     const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -76,13 +69,13 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
         customerAddress: "",
 
         // Details
-        documentNumber: generateDocumentNumber(config.prefix),
-        issueDate: new Date().toISOString().split("T")[0],
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        documentNumber: "",
+        issueDate: "",
+        dueDate: "",
         currency: "USD",
 
         // Items
-        items: [{ id: generateId(), description: "", quantity: 1, unitPrice: 0 }],
+        items: [{ id: "1", description: "", quantity: 1, unitPrice: 0 }],
 
         // Financial
         taxPercent: 0,
@@ -95,7 +88,7 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
         paymentMethod: "Cash",
 
         // Quotation-specific
-        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        expiryDate: "",
         validityPeriod: "30 days",
         scopeLimitations: "",
 
@@ -109,6 +102,29 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
         documentType: documentType,
         templateId: "simple",
     });
+
+    // Hydration fix: Populate random/date fields on client side
+    useEffect(() => {
+        setFormData((prev) => ({
+            ...prev,
+            documentNumber: prev.documentNumber || generateDocumentNumber(config.prefix),
+            issueDate: prev.issueDate || new Date().toISOString().split("T")[0],
+            dueDate: prev.dueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+            expiryDate: prev.expiryDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        }));
+    }, [config.prefix]);
+
+    // Sync template from URL
+    useEffect(() => {
+        const tplParam = searchParams.get("template");
+        if (tplParam) {
+            const found = INVOICE_TEMPLATES.find((t) => t.id === tplParam);
+            if (found) {
+                setSelectedTemplate(found.id);
+                setFormData(prev => ({ ...prev, templateId: found.id }));
+            }
+        }
+    }, [searchParams]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
