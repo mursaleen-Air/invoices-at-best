@@ -9,11 +9,12 @@ export interface InvoiceTemplate {
     style: {
         headerColor: { r: number; g: number; b: number };
         accentColor: { r: number; g: number; b: number };
-        fontStyle: "clean" | "bold" | "elegant";
-        layout: "classic" | "modern" | "compact" | "executive" | "creative" | "minimal";
+        fontFamily: "sans" | "serif" | "mono";
+        layout: "classic" | "modern" | "compact" | "executive" | "minimal";
         showBorder: boolean;
         showAccentLine: boolean;
         headerBgFill: boolean;
+        tableStyle: "clean" | "filled" | "minimal" | "bold";
     };
 }
 
@@ -26,13 +27,14 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         previewGradient: "from-slate-500 to-slate-700",
         previewAccent: "#64748b",
         style: {
-            headerColor: { r: 0.11, g: 0.11, b: 0.11 },
+            headerColor: { r: 0.15, g: 0.15, b: 0.15 },
             accentColor: { r: 0.4, g: 0.4, b: 0.4 },
-            fontStyle: "clean",
+            fontFamily: "sans",
             layout: "classic",
             showBorder: false,
             showAccentLine: false,
             headerBgFill: false,
+            tableStyle: "clean",
         },
     },
     {
@@ -43,13 +45,14 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         previewGradient: "from-blue-500 to-indigo-700",
         previewAccent: "#4f46e5",
         style: {
-            headerColor: { r: 0.145, g: 0.388, b: 0.922 },
-            accentColor: { r: 0.31, g: 0.275, b: 0.898 },
-            fontStyle: "bold",
+            headerColor: { r: 0.1, g: 0.3, b: 0.9 },
+            accentColor: { r: 0.2, g: 0.2, b: 0.8 },
+            fontFamily: "sans",
             layout: "modern",
             showBorder: false,
             showAccentLine: true,
             headerBgFill: false,
+            tableStyle: "filled",
         },
     },
     {
@@ -60,13 +63,14 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         previewGradient: "from-gray-800 to-gray-950",
         previewAccent: "#d4af37",
         style: {
-            headerColor: { r: 0.12, g: 0.12, b: 0.14 },
-            accentColor: { r: 0.831, g: 0.686, b: 0.216 },
-            fontStyle: "elegant",
+            headerColor: { r: 0.1, g: 0.1, b: 0.12 },
+            accentColor: { r: 0.8, g: 0.6, b: 0.2 },
+            fontFamily: "serif",
             layout: "executive",
             showBorder: true,
             showAccentLine: true,
             headerBgFill: true,
+            tableStyle: "filled",
         },
     },
     {
@@ -77,13 +81,14 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         previewGradient: "from-emerald-500 to-teal-700",
         previewAccent: "#059669",
         style: {
-            headerColor: { r: 0.02, g: 0.588, b: 0.412 },
-            accentColor: { r: 0.051, g: 0.431, b: 0.353 },
-            fontStyle: "clean",
+            headerColor: { r: 0.05, g: 0.6, b: 0.4 },
+            accentColor: { r: 0.05, g: 0.5, b: 0.3 },
+            fontFamily: "sans",
             layout: "compact",
             showBorder: false,
             showAccentLine: true,
             headerBgFill: false,
+            tableStyle: "bold",
         },
     },
     {
@@ -94,13 +99,14 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         previewGradient: "from-rose-500 to-orange-600",
         previewAccent: "#e11d48",
         style: {
-            headerColor: { r: 0.882, g: 0.114, b: 0.282 },
-            accentColor: { r: 0.918, g: 0.341, b: 0.173 },
-            fontStyle: "bold",
-            layout: "creative",
+            headerColor: { r: 0.9, g: 0.1, b: 0.3 },
+            accentColor: { r: 0.95, g: 0.3, b: 0.2 },
+            fontFamily: "sans",
+            layout: "modern", // Changed from 'creative' to 'modern' to simplify layout refactor
             showBorder: false,
             showAccentLine: true,
             headerBgFill: true,
+            tableStyle: "bold",
         },
     },
     {
@@ -111,13 +117,14 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         previewGradient: "from-neutral-400 to-neutral-600",
         previewAccent: "#171717",
         style: {
-            headerColor: { r: 0.09, g: 0.09, b: 0.09 },
-            accentColor: { r: 0.6, g: 0.6, b: 0.6 },
-            fontStyle: "elegant",
+            headerColor: { r: 0.1, g: 0.1, b: 0.1 },
+            accentColor: { r: 0.5, g: 0.5, b: 0.5 },
+            fontFamily: "mono",
             layout: "minimal",
             showBorder: true,
             showAccentLine: false,
             headerBgFill: false,
+            tableStyle: "minimal",
         },
     },
 ];
