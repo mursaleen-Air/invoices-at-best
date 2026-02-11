@@ -65,7 +65,7 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         style: {
             headerColor: { r: 0.1, g: 0.1, b: 0.12 },
             accentColor: { r: 0.8, g: 0.6, b: 0.2 },
-            fontFamily: "serif",
+            fontFamily: "sans",
             layout: "executive",
             showBorder: true,
             showAccentLine: true,

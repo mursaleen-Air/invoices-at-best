@@ -50,6 +50,9 @@ export async function generateDocumentPDF(
     const isExecutive = tplStyle.layout === "executive";
     const isMinimal = tplStyle.layout === "minimal";
     const margin = 50;
+
+    // Header Dimensions
+    const headerBlockHeight = tplStyle.headerBgFill ? 160 : 100;
     let y = height - 50;
 
     // --- DECORATIONS ---
@@ -71,9 +74,9 @@ export async function generateDocumentPDF(
     if (tplStyle.headerBgFill) {
         page.drawRectangle({
             x: tplStyle.showBorder ? 22 : 0,
-            y: height - 120,
+            y: height - headerBlockHeight,
             width: tplStyle.showBorder ? width - 44 : width,
-            height: 120,
+            height: headerBlockHeight,
             color: primaryColor,
         });
     }
@@ -82,7 +85,7 @@ export async function generateDocumentPDF(
     if (tplStyle.showAccentLine) {
         page.drawRectangle({
             x: tplStyle.showBorder ? 22 : 0,
-            y: height - (tplStyle.headerBgFill ? 124 : 4),
+            y: height - (tplStyle.headerBgFill ? headerBlockHeight + 4 : 4),
             width: tplStyle.showBorder ? width - 44 : width,
             height: 4,
             color: accentColor,
@@ -95,18 +98,14 @@ export async function generateDocumentPDF(
     const headerSubTextColor = tplStyle.headerBgFill ? rgb(0.9, 0.9, 0.9) : lightGray;
 
     // Logic for positioning - Modern aligns right
-    const logoX = isModern ? width - margin - 100 : margin; // Placeholder, refined below
-    const titleBaseX = isModern ? margin : (width - margin); // Modern flips standard: Title Left, Logo Right? No, let's Stick to standard
-
-    // Let's define layout blocks:
-    // Standard: Title Left, Details Right.
-    // Modern: Title Right, Details Left.
+    const logoX = isModern ? width - margin - 100 : margin;
+    const titleBaseX = isModern ? margin : (width - margin);
 
     const blockLeftX = margin;
     const blockRightX = width / 2 + 20;
 
-    // Header Y position adjustment
-    if (tplStyle.headerBgFill) y -= 20;
+    // Header Y position adjustment (inside fill)
+    if (tplStyle.headerBgFill) y = height - 50;
 
     let titleX = margin;
     let titleAlignRight = false;
@@ -127,7 +126,7 @@ export async function generateDocumentPDF(
                 : await pdfDoc.embedJpg(logoBytes);
 
             const logoDims = logoImage.scale(1);
-            const maxW = 120, maxH = 50;
+            const maxW = 140, maxH = 60; // Increased logo area
             const scale = Math.min(maxW / logoDims.width, maxH / logoDims.height, 1);
             logoWidth = logoDims.width * scale;
             const logoH = logoDims.height * scale;
@@ -141,16 +140,20 @@ export async function generateDocumentPDF(
             });
 
             // Adjust title position if on same side
-            if (!isModern) titleX += logoWidth + 20;
+            if (!isModern) titleX += logoWidth + 25;
         } catch (e) { /* ignore */ }
     }
 
     // Draw Title
-    const titleSize = 32;
+    const titleSize = 34; // Slightly larger title
     const titleWidth = boldFont.widthOfTextAtSize(config.title, titleSize);
+
+    // Align title vertically with logo top or slightly lower
+    const titleY = y;
+
     page.drawText(config.title, {
         x: titleAlignRight ? titleX - titleWidth : titleX,
-        y: y,
+        y: titleY,
         size: titleSize,
         font: boldFont,
         color: headerTextColor,
@@ -158,26 +161,27 @@ export async function generateDocumentPDF(
 
     // Document Number & Dates
     y -= 40;
-    const metaX = isModern ? margin : width - 200; // Modern puts meta on left
+    const metaX = isModern ? margin : width - 200;
 
     page.drawText(`# ${document.documentNumber}`, {
         x: metaX, y, size: 12, font: boldFont, color: headerTextColor
     });
 
-    y -= 15;
+    y -= 20; // 5px more spacing
     page.drawText(`Date: ${document.issueDate}`, {
         x: metaX, y, size: 10, font: regularFont, color: headerSubTextColor
     });
 
     if (document.dueDate) {
-        y -= 12;
+        y -= 15;
         page.drawText(`Due: ${document.dueDate}`, {
             x: metaX, y, size: 10, font: regularFont, color: headerSubTextColor
         });
     }
 
     // --- ADDRESS BLOCKS ---
-    y = height - 160;
+    // Start below the header block with padding
+    y = height - headerBlockHeight - 50;
 
     // Helper for address
     const drawAddress = (title: string, name: string, addr?: string, email?: string, phone?: string, xArg?: number) => {
