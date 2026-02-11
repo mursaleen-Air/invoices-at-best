@@ -1,0 +1,16 @@
+{
+    "name": "InvoiceGen — Professional Invoice Generator",
+    "short_name": "InvoiceGen",
+    "description": "Generate professional invoices, receipts, quotations, and proforma invoices instantly.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f0f5ff",
+    "theme_color": "#2563eb",
+    "icons": [
+        {
+            "src": "/favicon.ico",
+            "sizes": "any",
+            "type": "image/x-icon"
+        }
+    ]
+}
