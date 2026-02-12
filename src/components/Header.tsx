@@ -10,7 +10,6 @@ export default function Header() {
     const pathname = usePathname();
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isPremium, setIsPremium] = useState(false);
 
     useEffect(() => {
         const supabase = createClient();
@@ -21,23 +20,8 @@ export default function Header() {
                     data: { user },
                 } = await supabase.auth.getUser();
                 setUser(user);
-
-                if (user) {
-                    try {
-                        const res = await fetch("/api/subscription/status");
-                        if (res.ok) {
-                            const data = await res.json();
-                            setIsPremium(data.isPremium);
-                        }
-                    } catch {
-                        // Silently fail
-                    }
-                } else {
-                    setIsPremium(false);
-                }
             } catch {
                 setUser(null);
-                setIsPremium(false);
             } finally {
                 setIsLoading(false);
             }
@@ -48,21 +32,7 @@ export default function Header() {
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === "SIGNED_OUT" || !session?.user) {
-                setUser(null);
-                setIsPremium(false);
-            } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-                setUser(session.user);
-                // Re-check premium status on sign-in or token refresh
-                fetch("/api/subscription/status")
-                    .then((res) => res.ok ? res.json() : null)
-                    .then((data) => {
-                        if (data) setIsPremium(data.isPremium);
-                    })
-                    .catch(() => { });
-            } else {
-                setUser(session?.user ?? null);
-            }
+            setUser(session?.user ?? null);
         });
 
         return () => subscription.unsubscribe();
@@ -115,28 +85,10 @@ export default function Header() {
                             </Link>
                         ))}
 
-                        <Link
-                            href="/pricing"
-                            className={`text-sm font-medium transition-colors duration-200 ${pathname === "/pricing"
-                                ? "text-primary-600"
-                                : "text-gray-600 hover:text-gray-900"
-                                }`}
-                        >
-                            Pricing
-                        </Link>
-
                         {!isLoading && (
                             <>
                                 {user ? (
                                     <div className="flex items-center gap-3">
-                                        {isPremium && (
-                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-yellow-900 text-xs font-bold rounded-full shadow-sm">
-                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                                </svg>
-                                                PRO
-                                            </span>
-                                        )}
                                         <Link
                                             href="/dashboard"
                                             className={`text-sm font-medium transition-colors duration-200 ${pathname === "/dashboard"
@@ -190,40 +142,19 @@ export default function Header() {
                                         {link.label}
                                     </Link>
                                 ))}
-                                <Link
-                                    href="/pricing"
-                                    className={`block px-4 py-2 text-sm font-medium transition-colors ${pathname === "/pricing"
-                                        ? "text-primary-600 bg-primary-50"
-                                        : "text-gray-600 hover:bg-gray-50"
-                                        }`}
-                                >
-                                    Pricing
-                                </Link>
                                 <hr className="my-2 border-gray-200" />
                                 {!isLoading && (
                                     <>
                                         {user ? (
-                                            <>
-                                                {isPremium && (
-                                                    <div className="px-4 py-2">
-                                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-yellow-900 text-xs font-bold rounded-full">
-                                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                                                <path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                                            </svg>
-                                                            PRO
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                <Link
-                                                    href="/dashboard"
-                                                    className={`block px-4 py-2 text-sm font-medium transition-colors ${pathname === "/dashboard"
-                                                        ? "text-primary-600 bg-primary-50"
-                                                        : "text-gray-600 hover:bg-gray-50"
-                                                        }`}
-                                                >
-                                                    Dashboard
-                                                </Link>
-                                            </>
+                                            <Link
+                                                href="/dashboard"
+                                                className={`block px-4 py-2 text-sm font-medium transition-colors ${pathname === "/dashboard"
+                                                    ? "text-primary-600 bg-primary-50"
+                                                    : "text-gray-600 hover:bg-gray-50"
+                                                    }`}
+                                            >
+                                                Dashboard
+                                            </Link>
                                         ) : (
                                             <>
                                                 <Link

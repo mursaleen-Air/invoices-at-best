@@ -59,7 +59,7 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         id: "executive-dark",
         name: "Executive Dark",
         description: "A premium dark header with gold accents. Ideal for consulting and agencies.",
-        isPremium: true,
+        isPremium: false,
         previewGradient: "from-gray-800 to-gray-950",
         previewAccent: "#d4af37",
         style: {
@@ -77,7 +77,7 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         id: "fresh-green",
         name: "Fresh Green",
         description: "Earthy green tones for eco-conscious and health-focused businesses.",
-        isPremium: true,
+        isPremium: false,
         previewGradient: "from-emerald-500 to-teal-700",
         previewAccent: "#059669",
         style: {
@@ -95,7 +95,7 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         id: "creative-coral",
         name: "Creative Coral",
         description: "Vibrant warm tones with a creative layout. Perfect for designers and creatives.",
-        isPremium: true,
+        isPremium: false,
         previewGradient: "from-rose-500 to-orange-600",
         previewAccent: "#e11d48",
         style: {
@@ -113,7 +113,7 @@ export const INVOICE_TEMPLATES: InvoiceTemplate[] = [
         id: "minimal-mono",
         name: "Minimal Mono",
         description: "Ultra-minimal black and white design. Timeless and distraction-free.",
-        isPremium: true,
+        isPremium: false,
         previewGradient: "from-neutral-400 to-neutral-600",
         previewAccent: "#171717",
         style: {
