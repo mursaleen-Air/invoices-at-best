@@ -99,14 +99,7 @@ export default function Header() {
                                             Dashboard
                                         </Link>
                                     </div>
-                                ) : (
-                                    <Link
-                                        href="/login"
-                                        className="btn-primary text-sm py-2 px-4"
-                                    >
-                                        Sign in
-                                    </Link>
-                                )}
+                                ) : null}
                             </>
                         )}
                     </nav>
@@ -142,35 +135,18 @@ export default function Header() {
                                         {link.label}
                                     </Link>
                                 ))}
-                                <hr className="my-2 border-gray-200" />
-                                {!isLoading && (
+                                {!isLoading && user && (
                                     <>
-                                        {user ? (
-                                            <Link
-                                                href="/dashboard"
-                                                className={`block px-4 py-2 text-sm font-medium transition-colors ${pathname === "/dashboard"
-                                                    ? "text-primary-600 bg-primary-50"
-                                                    : "text-gray-600 hover:bg-gray-50"
-                                                    }`}
-                                            >
-                                                Dashboard
-                                            </Link>
-                                        ) : (
-                                            <>
-                                                <Link
-                                                    href="/login"
-                                                    className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
-                                                >
-                                                    Sign in
-                                                </Link>
-                                                <Link
-                                                    href="/signup"
-                                                    className="block px-4 py-2 text-sm font-medium text-primary-600 hover:bg-primary-50"
-                                                >
-                                                    Sign up
-                                                </Link>
-                                            </>
-                                        )}
+                                        <hr className="my-2 border-gray-200" />
+                                        <Link
+                                            href="/dashboard"
+                                            className={`block px-4 py-2 text-sm font-medium transition-colors ${pathname === "/dashboard"
+                                                ? "text-primary-600 bg-primary-50"
+                                                : "text-gray-600 hover:bg-gray-50"
+                                                }`}
+                                        >
+                                            Dashboard
+                                        </Link>
                                     </>
                                 )}
                             </div>
