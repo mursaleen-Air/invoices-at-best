@@ -7,7 +7,7 @@ import StructuredData from "@/components/StructuredData";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { generateSoftwareApplicationSchema } from "@/lib/seo";
 import AdProvider from "@/components/ads/AdProvider";
-import Script from "next/script";
+
 
 const inter = Inter({
     subsets: ["latin"],
@@ -36,13 +36,14 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${inter.className} flex flex-col min-h-screen`}>
-                <Script
+            <head>
+                <script
                     async
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1985129550910366"
                     crossOrigin="anonymous"
-                    strategy="afterInteractive"
-                />
+                ></script>
+            </head>
+            <body className={`${inter.className} flex flex-col min-h-screen`}>
                 <StructuredData data={generateSoftwareApplicationSchema()} />
                 <AdProvider>
                     <ErrorBoundary>
