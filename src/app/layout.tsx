@@ -34,19 +34,15 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
-
     return (
         <html lang="en">
             <body className={`${inter.className} flex flex-col min-h-screen`}>
-                {adsenseClientId && (
-                    <Script
-                        async
-                        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
-                        crossOrigin="anonymous"
-                        strategy="afterInteractive"
-                    />
-                )}
+                <Script
+                    async
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1985129550910366"
+                    crossOrigin="anonymous"
+                    strategy="afterInteractive"
+                />
                 <StructuredData data={generateSoftwareApplicationSchema()} />
                 <AdProvider>
                     <ErrorBoundary>
