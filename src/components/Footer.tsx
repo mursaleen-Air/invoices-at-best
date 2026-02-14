@@ -49,15 +49,21 @@ export default function Footer() {
                         <ul className="space-y-4 text-sm">
                             <li><Link href="/blog" className="text-slate-600 hover:text-indigo-600 transition-colors">Business Blog</Link></li>
                             <li><Link href="/invoice-templates" className="text-slate-600 hover:text-indigo-600 transition-colors">Invoice Templates</Link></li>
-                            <li><Link href="/pricing" className="text-slate-600 hover:text-indigo-600 transition-colors">Pricing</Link></li>
+
                             <li><Link href="/free-invoice-generator" className="text-slate-600 hover:text-indigo-600 transition-colors">Free Tools</Link></li>
                         </ul>
                     </div>
 
                     {/* Company */}
                     <div>
-                        <h3 className="font-semibold text-slate-900 mb-6">Company</h3>
+                        <h3 className="font-semibold text-slate-900 mb-6">Get in Touch</h3>
                         <ul className="space-y-4 text-sm">
+                            <li>
+                                <a href="mailto:mursaleen231213@gmail.com" className="text-slate-600 hover:text-indigo-600 transition-colors flex items-center gap-2">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                    mursaleen231213@gmail.com
+                                </a>
+                            </li>
                             <li><Link href="/about" className="text-slate-600 hover:text-indigo-600 transition-colors">About Us</Link></li>
                             <li><Link href="/contact" className="text-slate-600 hover:text-indigo-600 transition-colors">Contact Support</Link></li>
                             <li><Link href="/privacy" className="text-slate-600 hover:text-indigo-600 transition-colors">Privacy Policy</Link></li>
