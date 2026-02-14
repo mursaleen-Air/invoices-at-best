@@ -36,7 +36,7 @@ export default function ContactPage() {
                             </div>
                             <div>
                                 <h3 className="font-semibold text-slate-900">Email</h3>
-                                <a href="mailto:support@invoicesatbest.com" className="text-indigo-600 hover:text-indigo-800 transition-colors">support@invoicesatbest.com</a>
+                                <a href="mailto:mursaleen231213@gmail.com" className="text-indigo-600 hover:text-indigo-800 transition-colors">mursaleen231213@gmail.com</a>
                             </div>
                         </div>
 

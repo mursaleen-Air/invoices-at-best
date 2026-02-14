@@ -67,7 +67,7 @@ export default function PrivacyPage() {
 
                 <h3>8. Contact Us</h3>
                 <p>
-                    If you have any questions about our Privacy Policy, please contact us at <a href="mailto:privacy@invoicesatbest.com">privacy@invoicesatbest.com</a>.
+                    If you have any questions about our Privacy Policy, please contact us at <a href="mailto:mursaleen231213@gmail.com">mursaleen231213@gmail.com</a>.
                 </p>
             </div>
         </AdWrappedLayout>

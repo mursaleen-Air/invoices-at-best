@@ -64,7 +64,7 @@ export default function TermsPage() {
 
                 <h3>9. Contact Us</h3>
                 <p>
-                    If you have any questions about these Terms, please contact us at <a href="mailto:support@invoicesatbest.com">support@invoicesatbest.com</a>.
+                    If you have any questions about these Terms, please contact us at <a href="mailto:mursaleen231213@gmail.com">mursaleen231213@gmail.com</a>.
                 </p>
             </div>
         </AdWrappedLayout>
