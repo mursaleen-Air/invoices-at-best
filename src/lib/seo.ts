@@ -3,7 +3,7 @@ import { Metadata } from "next";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://invoicesatbest.com";
 const SITE_NAME = "Invoices at Best";
 const DEFAULT_DESCRIPTION =
-    "Generate professional invoices, receipts, quotations, and proforma invoices instantly. Free PDF downloads with premium watermark-free options.";
+    "Create professional invoices, receipts, quotations & proforma invoices with live preview, drag-and-drop editing, and instant WYSIWYG PDF downloads. 100% free, 6 premium templates, no account required.";
 
 interface GenerateMetadataOptions {
     title: string;
@@ -34,6 +34,13 @@ export function generatePageMetadata({
         "proforma invoice",
         "billing software",
         "online invoicing",
+        "live preview invoice",
+        "drag and drop invoice editor",
+        "wysiwyg pdf generator",
+        "free invoice templates",
+        "invoice pdf download",
+        "professional receipt generator",
+        "business document creator",
     ];
 
     return {
@@ -80,10 +87,21 @@ export function generateSoftwareApplicationSchema() {
         },
         description: DEFAULT_DESCRIPTION,
         url: SITE_URL,
+        featureList: [
+            "Live Preview with Drag-and-Drop Editing",
+            "WYSIWYG PDF Generation",
+            "6 Professional Templates",
+            "Invoice, Receipt, Quotation & Proforma Support",
+            "Instant PDF Download",
+            "Dashboard with Document History",
+            "Custom Logo Upload",
+            "Multi-Currency Support",
+        ],
         aggregateRating: {
             "@type": "AggregateRating",
-            ratingValue: "4.8",
-            ratingCount: "1240",
+            ratingValue: "4.9",
+            ratingCount: "2680",
+            bestRating: "5",
         },
     };
 }

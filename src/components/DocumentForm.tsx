@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, FormEvent, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { DocumentFormData, DocumentItem, DocumentType, DOCUMENT_CONFIG } from "@/types/invoice";
 import { INVOICE_TEMPLATES, getTemplate } from "@/lib/templates";
+import DocumentPreview from "@/components/DocumentPreview";
 
 function generateId(): string {
     return Math.random().toString(36).substring(2, 11);
@@ -30,6 +31,7 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
 
     const [selectedTemplate, setSelectedTemplate] = useState("simple");
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
+    const [showPreview, setShowPreview] = useState(false);
 
 
 
@@ -197,9 +199,9 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
         }).format(amount);
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    // Validate and open preview
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        setIsSubmitting(true);
         setErrors({});
 
         // --- Client-side validation ---
@@ -258,75 +260,21 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
 
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
-            setIsSubmitting(false);
             return;
         }
         // --- End client-side validation ---
 
-        try {
-            const payload = { ...formData, templateId: selectedTemplate };
-            const response = await fetch("/api/invoice/generate-pdf", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
+        // Open preview instead of downloading directly
+        setShowPreview(true);
+    };
 
-            if (!response.ok) {
-                let errorData;
-                try {
-                    errorData = await response.json();
-                } catch {
-                    setErrors({ general: `Server error (${response.statusText || response.status}). Please try again.` });
-                    return;
-                }
-
-                // Use console.warn instead of console.error to avoid triggering
-                // the Next.js dev error overlay for expected validation responses
-                if (process.env.NODE_ENV === "development") {
-                    console.warn("Server validation response:", errorData);
-                }
-
-                if (errorData && errorData.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
-                    const newErrors: Record<string, string> = {};
-                    errorData.errors.forEach(
-                        (err: { field: string; message: string }) => {
-                            newErrors[err.field] = err.message;
-                        }
-                    );
-                    setErrors(newErrors);
-                } else if (errorData && errorData.error) {
-                    // Handle single error field (like rate limit)
-                    setErrors({ general: errorData.error });
-                } else {
-                    setErrors({ general: "An unexpected error occurred. Please check your inputs and try again." });
-                }
-                return;
-            }
-
-            // Download the PDF
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `${documentType}-${formData.documentNumber}.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-
-            // Generate new document number
-            setFormData((prev) => ({
-                ...prev,
-                documentNumber: generateDocumentNumber(config.prefix),
-            }));
-        } catch (error) {
-            console.error("Failed to generate document:", error);
-            setErrors({ general: "Failed to generate document. Please try again." });
-        } finally {
-            setIsSubmitting(false);
-        }
+    // Called after successful PDF download from preview
+    const handleDownloadComplete = () => {
+        setShowPreview(false);
+        setFormData((prev) => ({
+            ...prev,
+            documentNumber: generateDocumentNumber(config.prefix),
+        }));
     };
 
     const primaryColorClass = {
@@ -360,33 +308,161 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
 
                 {/* Template Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-                    {INVOICE_TEMPLATES.map((tpl) => (
-                        <button
-                            key={tpl.id}
-                            type="button"
-                            onClick={() => {
-                                setSelectedTemplate(tpl.id);
-                                setFormData((prev) => ({ ...prev, templateId: tpl.id }));
-                            }}
-                            className={`relative rounded-xl p-3 border-2 transition-all duration-200 text-left ${selectedTemplate === tpl.id
-                                ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200"
-                                : "border-slate-200 hover:border-slate-300 bg-white"
-                                }`}
-                        >
-                            {/* Badge */}
-                            <span className={`absolute -top-2 -right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${tpl.isPremium ? "bg-amber-400 text-amber-900" : "bg-emerald-400 text-emerald-900"
-                                }`}>
-                                {tpl.isPremium ? "PRO" : "FREE"}
-                            </span>
+                    {INVOICE_TEMPLATES.map((tpl) => {
+                        const hdr = tpl.style.headerColor;
+                        const acc = tpl.style.accentColor;
+                        const headerCSS = `rgb(${Math.round(hdr.r * 255)}, ${Math.round(hdr.g * 255)}, ${Math.round(hdr.b * 255)})`;
+                        const accentCSS = `rgb(${Math.round(acc.r * 255)}, ${Math.round(acc.g * 255)}, ${Math.round(acc.b * 255)})`;
 
-                            {/* Mini preview */}
-                            <div className={`w-full h-16 bg-gradient-to-br ${tpl.previewGradient} rounded-lg mb-2 flex items-center justify-center`}>
-                                <div className="w-8 h-10 bg-white/90 rounded-sm shadow-sm" />
-                            </div>
-                            <p className="text-xs font-semibold text-slate-700 truncate">{tpl.name}</p>
-                        </button>
-                    ))}
+                        return (
+                            <button
+                                key={tpl.id}
+                                type="button"
+                                onClick={() => {
+                                    setSelectedTemplate(tpl.id);
+                                    setFormData((prev) => ({ ...prev, templateId: tpl.id }));
+                                }}
+                                className={`relative rounded-xl p-3 border-2 transition-all duration-200 text-left group ${selectedTemplate === tpl.id
+                                    ? "border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-200 scale-[1.02]"
+                                    : "border-slate-200 hover:border-slate-300 hover:shadow-md bg-white"
+                                    }`}
+                            >
+                                {/* Badge */}
+                                <span className={`absolute -top-2 -right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full z-10 ${tpl.isPremium ? "bg-amber-400 text-amber-900" : "bg-emerald-400 text-emerald-900"
+                                    }`}>
+                                    {tpl.isPremium ? "PRO" : "FREE"}
+                                </span>
+
+                                {/* Mini document preview */}
+                                <div
+                                    className="w-full aspect-[3/4] rounded-lg mb-2 overflow-hidden relative"
+                                    style={{
+                                        border: tpl.style.showBorder ? `1.5px solid ${accentCSS}` : "1px solid #e2e8f0",
+                                        backgroundColor: "#ffffff",
+                                    }}
+                                >
+                                    {/* Accent line at top */}
+                                    {tpl.style.showAccentLine && (
+                                        <div
+                                            style={{
+                                                height: "3px",
+                                                background: `linear-gradient(90deg, ${headerCSS}, ${accentCSS})`,
+                                            }}
+                                        />
+                                    )}
+
+                                    {/* Header area */}
+                                    <div
+                                        className="px-2 pt-2 pb-1.5"
+                                        style={
+                                            tpl.style.headerBgFill
+                                                ? {
+                                                    background: `linear-gradient(135deg, ${headerCSS}, ${accentCSS})`,
+                                                    padding: "8px 8px 6px",
+                                                }
+                                                : {}
+                                        }
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div>
+                                                <div
+                                                    className="h-1.5 w-12 rounded-full mb-1"
+                                                    style={{ backgroundColor: tpl.style.headerBgFill ? "rgba(255,255,255,0.8)" : headerCSS }}
+                                                />
+                                                <div
+                                                    className="h-1 w-8 rounded-full opacity-60"
+                                                    style={{ backgroundColor: tpl.style.headerBgFill ? "rgba(255,255,255,0.5)" : "#94a3b8" }}
+                                                />
+                                            </div>
+                                            <div
+                                                className="h-2.5 w-10 rounded-sm font-mono"
+                                                style={{
+                                                    backgroundColor: tpl.style.headerBgFill ? "rgba(255,255,255,0.25)" : `${headerCSS}15`,
+                                                    border: tpl.style.headerBgFill ? "none" : `0.5px solid ${headerCSS}30`,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Details row */}
+                                    <div className="px-2 py-1 flex justify-between">
+                                        <div className="space-y-0.5">
+                                            <div className="h-1 w-7 rounded-full bg-slate-200" />
+                                            <div className="h-1 w-10 rounded-full bg-slate-300" />
+                                        </div>
+                                        <div className="space-y-0.5 text-right">
+                                            <div className="h-1 w-6 rounded-full bg-slate-200 ml-auto" />
+                                            <div className="h-1 w-8 rounded-full bg-slate-200 ml-auto" />
+                                        </div>
+                                    </div>
+
+                                    {/* Mini table */}
+                                    <div className="px-2 mt-0.5">
+                                        {/* Table header */}
+                                        <div
+                                            className="h-2 rounded-sm mb-0.5 flex items-center gap-1 px-1"
+                                            style={{
+                                                backgroundColor:
+                                                    tpl.style.tableStyle === "filled" || tpl.style.tableStyle === "bold"
+                                                        ? `${headerCSS}18`
+                                                        : "transparent",
+                                                borderBottom: `0.5px solid ${accentCSS}30`,
+                                            }}
+                                        >
+                                            <div className="h-0.5 w-3 rounded-full bg-slate-300" />
+                                            <div className="h-0.5 flex-1 rounded-full bg-slate-300" />
+                                            <div className="h-0.5 w-3 rounded-full bg-slate-300" />
+                                        </div>
+                                        {/* Table rows */}
+                                        {[0, 1, 2].map((i) => (
+                                            <div
+                                                key={i}
+                                                className="h-2 flex items-center gap-1 px-1"
+                                                style={{
+                                                    backgroundColor:
+                                                        tpl.style.tableStyle === "filled" && i % 2 === 1
+                                                            ? `${headerCSS}08`
+                                                            : "transparent",
+                                                    borderBottom: "0.5px solid #f1f5f9",
+                                                }}
+                                            >
+                                                <div className="h-0.5 w-2 rounded-full bg-slate-200" />
+                                                <div className="h-0.5 flex-1 rounded-full bg-slate-200" />
+                                                <div className="h-0.5 w-3 rounded-full bg-slate-300" />
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Total */}
+                                    <div className="px-2 mt-1 flex justify-end">
+                                        <div
+                                            className="h-2 w-14 rounded-sm"
+                                            style={{
+                                                borderTop: `1px solid ${accentCSS}40`,
+                                            }}
+                                        >
+                                            <div className="flex justify-between items-center px-1 pt-0.5">
+                                                <div className="h-0.5 w-3 rounded-full bg-slate-300" />
+                                                <div className="h-1 w-4 rounded-full" style={{ backgroundColor: headerCSS }} />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Selected checkmark */}
+                                    {selectedTemplate === tpl.id && (
+                                        <div className="absolute bottom-1 right-1 w-4 h-4 bg-indigo-500 rounded-full flex items-center justify-center">
+                                            <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
+                                <p className="text-xs font-semibold text-slate-700 truncate">{tpl.name}</p>
+                            </button>
+                        );
+                    })}
                 </div>
+
 
                 {/* Logo Upload */}
                 <div className="border-t border-slate-100 pt-6">
@@ -706,25 +782,27 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
             <div className="flex justify-end">
                 <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className={`inline-flex items-center gap-3 px-8 py-4 text-lg font-bold text-white rounded-xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 bg-gradient-to-r ${primaryColorClass} ${shadowClass}`}
+                    className={`inline-flex items-center gap-3 px-8 py-4 text-lg font-bold text-white rounded-xl transition-all duration-300 transform hover:scale-[1.02] bg-gradient-to-r ${primaryColorClass} ${shadowClass}`}
                 >
-                    {isSubmitting ? (
-                        <>
-                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Generating PDF...
-                        </>
-                    ) : (
-                        <>
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                            Download PDF
-                        </>
-                    )}
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Preview &amp; Download
                 </button>
             </div>
+
+            {/* Document Preview Overlay */}
+            {showPreview && (
+                <DocumentPreview
+                    formData={formData}
+                    documentType={documentType}
+                    templateId={selectedTemplate}
+                    onFormDataChange={setFormData}
+                    onDownloadComplete={handleDownloadComplete}
+                    onClose={() => setShowPreview(false)}
+                />
+            )}
         </form>
     );
 }

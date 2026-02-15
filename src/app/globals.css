@@ -366,3 +366,18 @@ body {
     display: none !important;
   }
 }
+
+/* PDF capture mode — hide all edit/drag indicators */
+.pdf-capture-mode .group\/edit>svg,
+.pdf-capture-mode .group\/drag>div:first-child {
+  display: none !important;
+}
+
+.pdf-capture-mode * {
+  outline: none !important;
+  cursor: default !important;
+}
+
+.pdf-capture-mode .preview-page {
+  box-shadow: none !important;
+}

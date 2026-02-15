@@ -33,7 +33,7 @@ export default function SignupPage() {
 
         const supabase = createClient();
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -45,6 +45,30 @@ export default function SignupPage() {
             setError(error.message);
             setIsLoading(false);
             return;
+        }
+
+        // If user is auto-confirmed (email confirmation disabled in Supabase),
+        // the session will be set automatically - redirect to dashboard
+        if (data?.user?.email_confirmed_at || data?.session) {
+            router.push("/dashboard");
+            router.refresh();
+            return;
+        }
+
+        // If email confirmation is required, try to auto-login
+        // (works when Supabase has "Confirm email" disabled)
+        try {
+            const { error: loginError } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+            if (!loginError) {
+                router.push("/dashboard");
+                router.refresh();
+                return;
+            }
+        } catch {
+            // Login failed - likely email confirmation is required
         }
 
         setSuccess(true);
@@ -67,22 +91,25 @@ export default function SignupPage() {
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     strokeWidth={2}
-                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                    d="M5 13l4 4L19 7"
                                 />
                             </svg>
                         </div>
                         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                            Check your email
+                            Account Created!
                         </h1>
                         <p className="text-gray-600 mb-6">
-                            We&apos;ve sent a confirmation link to <strong>{email}</strong>.
-                            Please check your inbox and click the link to verify your account.
+                            Your account has been created successfully.
+                            You can now sign in with your credentials.
                         </p>
                         <Link
                             href="/login"
-                            className="text-primary-600 hover:text-primary-700 font-medium"
+                            className="btn-primary inline-flex items-center gap-2"
                         >
-                            Back to login
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                            Go to Sign In
                         </Link>
                     </div>
                 </div>
