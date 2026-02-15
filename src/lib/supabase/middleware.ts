@@ -73,7 +73,10 @@ export async function updateSession(request: NextRequest) {
 
     if (isAuthPath && user) {
         const url = request.nextUrl.clone();
-        url.pathname = "/dashboard";
+        // Respect the redirect param if present (e.g., from PDF download flow)
+        const redirectTo = request.nextUrl.searchParams.get("redirect");
+        url.pathname = redirectTo || "/dashboard";
+        url.search = ""; // Clear query params
         return NextResponse.redirect(url);
     }
 
