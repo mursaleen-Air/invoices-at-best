@@ -11,6 +11,7 @@ function LoginForm() {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [termsAccepted, setTermsAccepted] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirect = searchParams.get("redirect") || "/dashboard";
@@ -204,9 +205,24 @@ function LoginForm() {
                             </div>
                         </div>
 
+                        <div className="flex items-start gap-3">
+                            <div className="flex items-center h-5">
+                                <input
+                                    id="terms"
+                                    type="checkbox"
+                                    checked={termsAccepted}
+                                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 transition-colors cursor-pointer"
+                                />
+                            </div>
+                            <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer select-none">
+                                I agree to the <Link href="/terms" target="_blank" className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline">Terms of Service</Link> and <Link href="/privacy" target="_blank" className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline">Privacy Policy</Link>
+                            </label>
+                        </div>
+
                         <button
                             type="submit"
-                            disabled={isLoading}
+                            disabled={isLoading || !termsAccepted}
                             className="w-full relative overflow-hidden bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold py-3.5 px-8 rounded-xl hover:scale-[1.01] transform transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 flex items-center justify-center gap-2"
                         >
                             {isLoading ? (
@@ -245,11 +261,6 @@ function LoginForm() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                         </svg>
                     </Link>
-
-                    {/* Footer note */}
-                    <p className="mt-8 text-center text-xs text-slate-400">
-                        By signing in, you agree to our terms of service and privacy policy.
-                    </p>
                 </div>
             </div>
         </div>
