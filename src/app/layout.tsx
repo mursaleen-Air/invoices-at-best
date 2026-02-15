@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -38,35 +39,34 @@ export default function RootLayout({
         <html lang="en">
             <head>
                 {/* Google Tag Manager */}
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                <Script id="gtm" strategy="afterInteractive">
+                    {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KK2PH9GK');`,
-                    }}
-                />
+})(window,document,'script','dataLayer','GTM-KK2PH9GK');`}
+                </Script>
                 {/* End Google Tag Manager */}
                 {/* Google tag (gtag.js) */}
-                <script
-                    async
+                <Script
                     src="https://www.googletagmanager.com/gtag/js?id=G-SEFYMVY5HG"
-                ></script>
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-SEFYMVY5HG');`,
-                    }}
+                    strategy="afterInteractive"
                 />
+                <Script id="google-analytics" strategy="afterInteractive">
+                    {`
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'G-SEFYMVY5HG');
+                    `}
+                </Script>
                 {/* End Google tag */}
-                <script
+                <Script
                     async
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1985129550910366"
                     crossOrigin="anonymous"
-                ></script>
+                    strategy="afterInteractive"
+                />
             </head>
             <body className={`${inter.className} flex flex-col min-h-screen`}>
                 {/* Google Tag Manager (noscript) */}
