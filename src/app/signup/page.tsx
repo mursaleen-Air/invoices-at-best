@@ -12,12 +12,19 @@ export default function SignupPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [termsAccepted, setTermsAccepted] = useState(false);
     const router = useRouter();
 
     const handleSignup = async (e: FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError(null);
+
+        if (!termsAccepted) {
+            setError("You must accept the terms and privacy policy");
+            setIsLoading(false);
+            return;
+        }
 
         if (password !== confirmPassword) {
             setError("Passwords do not match");
@@ -204,10 +211,25 @@ export default function SignupPage() {
                             />
                         </div>
 
+                        <div className="flex items-start gap-3">
+                            <div className="flex items-center h-5">
+                                <input
+                                    id="terms"
+                                    type="checkbox"
+                                    checked={termsAccepted}
+                                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 transition-colors cursor-pointer"
+                                />
+                            </div>
+                            <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer select-none">
+                                I agree to the <Link href="/terms" target="_blank" className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline">Terms of Service</Link> and <Link href="/privacy" target="_blank" className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline">Privacy Policy</Link>
+                            </label>
+                        </div>
+
                         <button
                             type="submit"
-                            disabled={isLoading}
-                            className="w-full btn-primary py-3 flex items-center justify-center gap-2"
+                            disabled={isLoading || !termsAccepted}
+                            className="w-full btn-primary py-3 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             {isLoading ? (
                                 <>
