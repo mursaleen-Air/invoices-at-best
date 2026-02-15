@@ -1,6 +1,6 @@
 const config = {
     site: {
-        url: process.env.NEXT_PUBLIC_SITE_URL || "https://invoicesatbest.com",
+        url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.invoicesatbest.online",
         name: "Invoices at Best",
     },
     supabase: {

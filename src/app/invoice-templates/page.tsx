@@ -2,13 +2,14 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { generatePageMetadata } from "@/lib/seo";
 import { INVOICE_TEMPLATES } from "@/lib/templates";
+import { TEMPLATE_PAGES } from "@/lib/template-pages-data";
 
 export const metadata: Metadata = generatePageMetadata({
-    title: "Invoice Templates — Free & Premium Professional Designs",
+    title: "Invoice Templates — Free Professional Designs for Every Business",
     description:
-        "Browse 6 professionally designed invoice templates. Choose from modern, executive, creative, and minimal styles. 2 free templates for everyone, premium designs for subscribers.",
+        "Browse free invoice templates for 1099 contractors, UK VAT, Australian ABN, consulting, photography, construction, and more. Download professional PDFs instantly.",
     path: "/invoice-templates",
-    keywords: ["invoice templates", "free invoice template", "professional invoice design", "invoice format", "premium invoice template"],
+    keywords: ["invoice templates", "free invoice template", "professional invoice design", "invoice format", "1099 invoice template", "vat invoice template"],
 });
 
 export default function InvoiceTemplatesPage() {
@@ -62,6 +63,62 @@ export default function InvoiceTemplatesPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {INVOICE_TEMPLATES.filter((t) => t.isPremium).map((tpl) => (
                             <TemplateCard key={tpl.id} template={tpl} />
+                        ))}
+                    </div>
+                </div>
+            </section>
+            {/* Browse by Niche — Tax */}
+            <section className="py-16 px-4">
+                <div className="max-w-6xl mx-auto">
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Tax & Compliance Templates</h2>
+                    <p className="text-slate-600 mb-8 text-sm">Country-specific invoice templates with the right tax fields pre-configured.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {TEMPLATE_PAGES.filter((t) => t.category === "tax").map((t) => (
+                            <Link
+                                key={t.slug}
+                                href={`/invoice-templates/${t.slug}`}
+                                className="glass-card group hover:-translate-y-1 transition-all duration-300"
+                            >
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-lg font-bold">
+                                        {t.currency.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors text-sm">{t.h1}</h3>
+                                        <span className="text-xs text-slate-500">{t.currency} · {t.taxLabel}</span>
+                                    </div>
+                                </div>
+                                <p className="text-slate-600 text-xs leading-relaxed line-clamp-2">{t.description}</p>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Browse by Niche — Industry */}
+            <section className="py-16 px-4 bg-slate-50">
+                <div className="max-w-6xl mx-auto">
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Industry-Specific Templates</h2>
+                    <p className="text-slate-600 mb-8 text-sm">Invoice templates tailored to your profession with relevant line items and terminology.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {TEMPLATE_PAGES.filter((t) => t.category === "industry").map((t) => (
+                            <Link
+                                key={t.slug}
+                                href={`/invoice-templates/${t.slug}`}
+                                className="glass-card group hover:-translate-y-1 transition-all duration-300"
+                            >
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors text-sm">{t.h1}</h3>
+                                    </div>
+                                </div>
+                                <p className="text-slate-600 text-xs leading-relaxed line-clamp-2">{t.description}</p>
+                            </Link>
                         ))}
                     </div>
                 </div>

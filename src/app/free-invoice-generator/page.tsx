@@ -14,11 +14,11 @@ export const metadata: Metadata = generatePageMetadata({
 });
 
 const faqs = [
-    { question: "Is Invoices at Best really free?", answer: "Yes! You can generate unlimited invoices for free. Free invoices include a subtle watermark. Upgrade to Premium to remove watermarks and access advanced features.", isOpen: true },
-    { question: "Do I need to create an account?", answer: "No account is required to generate invoices. Simply fill in the details and download your PDF instantly. Create an account to save and manage your invoices." },
-    { question: "Can I customize my invoices?", answer: "Yes, you can add your business details, customize line items, set tax rates, and more. Premium users get additional customization options." },
+    { question: "Is Invoices at Best really free?", answer: "Yes! You can generate unlimited invoices, receipts, quotations, and proforma invoices completely free. No hidden charges, no watermarks, no limits.", isOpen: true },
+    { question: "Do I need to create an account?", answer: "No account is required. Simply fill in the details and download your professional PDF instantly. It's that simple." },
+    { question: "Can I customize my invoices?", answer: "Absolutely. Add your business logo, customize line items, set tax rates, choose from 6 professional templates, and configure payment terms — all for free." },
     { question: "What format are the invoices?", answer: "All invoices are generated as professional PDF documents that can be printed, emailed, or shared digitally." },
-    { question: "Is my data secure?", answer: "Absolutely. We do not store your invoice data on our servers. PDFs are generated in real-time and delivered directly to your browser." },
+    { question: "Is my data secure?", answer: "Yes. We do not store your invoice data on our servers. PDFs are generated in real-time and delivered directly to your browser." },
 ];
 
 export default function FreeInvoiceGeneratorPage() {

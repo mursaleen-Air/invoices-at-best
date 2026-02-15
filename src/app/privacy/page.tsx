@@ -18,7 +18,7 @@ export default function PrivacyPage() {
                 </p>
 
                 <p>
-                    Your privacy is important to us. It is Invoices at Best's policy to respect your privacy regarding any information we may collect from you across our website, <a href="https://invoicesatbest.com">https://invoicesatbest.com</a>.
+                    Your privacy is important to us. It is Invoices at Best's policy to respect your privacy regarding any information we may collect from you across our website, <a href="https://www.invoicesatbest.online">https://www.invoicesatbest.online</a>.
                 </p>
 
                 <h3>1. Information We Collect</h3>

@@ -1,17 +1,15 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import StructuredData from "@/components/StructuredData";
-import { generateSoftwareApplicationSchema } from "@/lib/seo";
+import { generatePageMetadata, generateSoftwareApplicationSchema } from "@/lib/seo";
 import TemplateCarousel from "@/components/TemplateCarousel";
 
-export const metadata: Metadata = {
-    title: "Invoices at Best — The Ultimate Free Invoice Generator",
+export const metadata: Metadata = generatePageMetadata({
+    title: "The Ultimate Free Invoice Generator",
     description: "Create professional invoices, receipts, and quotations in seconds. 100% free PDF downloads. No credit card required. Trusted by freelancers worldwide.",
+    path: "",
     keywords: ["invoice generator", "receipt maker", "quotation generator", "proforma invoice", "free invoice"],
-    alternates: {
-        canonical: "https://invoicesatbest.com",
-    },
-};
+});
 
 export default function Home() {
     const documentTypes = [

@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
 import { getAllBlogSlugs } from "@/lib/blog-data";
+import { getAllTemplatePageSlugs } from "@/lib/template-pages-data";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://invoicesatbest.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.invoicesatbest.online";
 
 export default function sitemap(): MetadataRoute.Sitemap {
     const staticPages = [
@@ -10,9 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         { path: "/receipt", priority: 0.9, changeFrequency: "weekly" as const },
         { path: "/quotation", priority: 0.9, changeFrequency: "weekly" as const },
         { path: "/proforma", priority: 0.9, changeFrequency: "weekly" as const },
-        { path: "/login", priority: 0.5, changeFrequency: "monthly" as const },
-        { path: "/signup", priority: 0.5, changeFrequency: "monthly" as const },
-        { path: "/pricing", priority: 0.8, changeFrequency: "weekly" as const },
         { path: "/free-invoice-generator", priority: 0.9, changeFrequency: "weekly" as const },
         { path: "/receipt-maker", priority: 0.8, changeFrequency: "weekly" as const },
         { path: "/quotation-generator", priority: 0.8, changeFrequency: "weekly" as const },
@@ -30,14 +28,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ];
 
     const blogSlugs = getAllBlogSlugs();
-
     const blogPages = blogSlugs.map((slug) => ({
         path: `/blog/${slug}`,
         priority: 0.6 as const,
         changeFrequency: "monthly" as const,
     }));
 
-    const allPages = [...staticPages, ...blogPages];
+    const templateSlugs = getAllTemplatePageSlugs();
+    const templatePages = templateSlugs.map((slug) => ({
+        path: `/invoice-templates/${slug}`,
+        priority: 0.8 as const,
+        changeFrequency: "weekly" as const,
+    }));
+
+    const allPages = [...staticPages, ...blogPages, ...templatePages];
 
     return allPages.map((page) => ({
         url: `${SITE_URL}${page.path}`,

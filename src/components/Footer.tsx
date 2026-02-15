@@ -49,8 +49,11 @@ export default function Footer() {
                         <ul className="space-y-4 text-sm">
                             <li><Link href="/blog" className="text-slate-600 hover:text-indigo-600 transition-colors">Business Blog</Link></li>
                             <li><Link href="/invoice-templates" className="text-slate-600 hover:text-indigo-600 transition-colors">Invoice Templates</Link></li>
-
-                            <li><Link href="/free-invoice-generator" className="text-slate-600 hover:text-indigo-600 transition-colors">Free Tools</Link></li>
+                            <li><Link href="/free-invoice-generator" className="text-slate-600 hover:text-indigo-600 transition-colors">Free Invoice Generator</Link></li>
+                            <li><Link href="/freelance-invoice-generator" className="text-slate-600 hover:text-indigo-600 transition-colors">Freelance Invoicing</Link></li>
+                            <li><Link href="/small-business-invoicing" className="text-slate-600 hover:text-indigo-600 transition-colors">Small Business Invoicing</Link></li>
+                            <li><Link href="/online-billing-software" className="text-slate-600 hover:text-indigo-600 transition-colors">Online Billing Software</Link></li>
+                            <li><Link href="/invoice-generator-pdf" className="text-slate-600 hover:text-indigo-600 transition-colors">Invoice PDF Generator</Link></li>
                         </ul>
                     </div>
 

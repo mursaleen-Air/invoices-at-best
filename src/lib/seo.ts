@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://invoicesatbest.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.invoicesatbest.online";
 const SITE_NAME = "Invoices at Best";
 const DEFAULT_DESCRIPTION =
     "Create professional invoices, receipts, quotations & proforma invoices with live preview, drag-and-drop editing, and instant WYSIWYG PDF downloads. 100% free, 6 premium templates, no account required.";
