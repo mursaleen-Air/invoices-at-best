@@ -103,13 +103,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/* Trust Badges */}
-                <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500 mb-24 animate-fade-in delay-300">
-                    {/* Placeholder logos for trust */}
-                    {["Stripe", "PayPal", "Wise", "Revolut", "Square"].map((brand) => (
-                        <span key={brand} className="text-xl font-bold text-slate-400 select-none">{brand}</span>
-                    ))}
-                </div>
+
 
                 {/* Document Types Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-32 max-w-7xl mx-auto">
