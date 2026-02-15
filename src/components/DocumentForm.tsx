@@ -33,7 +33,12 @@ function DocumentFormInner({ documentType }: DocumentFormProps) {
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
     const [showPreview, setShowPreview] = useState(false);
 
-
+    // Auto-open preview if user just signed in with a pending download
+    useEffect(() => {
+        if (sessionStorage.getItem("pendingPdfDownload") === "true") {
+            setShowPreview(true);
+        }
+    }, []);
 
     const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

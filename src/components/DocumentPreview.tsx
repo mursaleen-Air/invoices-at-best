@@ -239,8 +239,44 @@ export default function DocumentPreview({
     const [scale, setScale] = useState(1);
     const [isGenerating, setIsGenerating] = useState(false);
     const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const previewRef = useRef<HTMLDivElement>(null);
     const pageRef = useRef<HTMLDivElement>(null);
+    const pendingDownloadRef = useRef(false);
+
+    // Check auth state on mount and handle pending download after sign-in
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const supabase = createClient();
+                const { data: { user } } = await supabase.auth.getUser();
+                const authed = !!user;
+                setIsAuthenticated(authed);
+
+                // If user just signed in and has a pending download, trigger it
+                if (authed && sessionStorage.getItem("pendingPdfDownload") === "true") {
+                    sessionStorage.removeItem("pendingPdfDownload");
+                    pendingDownloadRef.current = true;
+                }
+            } catch {
+                setIsAuthenticated(false);
+            }
+        };
+        checkAuth();
+    }, []);
+
+    // Auto-trigger download when pending flag is set and auth is confirmed
+    useEffect(() => {
+        if (isAuthenticated && pendingDownloadRef.current) {
+            pendingDownloadRef.current = false;
+            // Small delay to let the page render fully
+            const timer = setTimeout(() => {
+                handleDownloadFromPreview();
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAuthenticated]);
 
     // Auto-scale to fit container
     useEffect(() => {
@@ -297,18 +333,19 @@ export default function DocumentPreview({
         if (!pageRef.current || isGenerating) return;
 
         // Auth gate: require sign-in before PDF download
-        try {
-            const supabase = createClient();
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                setShowAuthPrompt(true);
-                setTimeout(() => {
-                    router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
-                }, 1500);
-                return;
-            }
-        } catch {
-            // If auth check fails, allow download as fallback
+        if (isAuthenticated === false) {
+            // Store pending download flag so we auto-download after sign-in
+            sessionStorage.setItem("pendingPdfDownload", "true");
+            setShowAuthPrompt(true);
+            setTimeout(() => {
+                router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+            }, 1500);
+            return;
+        }
+
+        // If auth state is still loading, wait briefly
+        if (isAuthenticated === null) {
+            return;
         }
 
         setIsGenerating(true);
