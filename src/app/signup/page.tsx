@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function SignupPage() {
+function SignupForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -14,6 +14,8 @@ export default function SignupPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirect = searchParams.get("redirect") || "/dashboard";
 
     const handleSignup = async (e: FormEvent) => {
         e.preventDefault();
@@ -57,7 +59,7 @@ export default function SignupPage() {
         // If user is auto-confirmed (email confirmation disabled in Supabase),
         // the session will be set automatically - redirect to dashboard
         if (data?.user?.email_confirmed_at || data?.session) {
-            router.push("/dashboard");
+            router.push(redirect);
             router.refresh();
             return;
         }
@@ -274,5 +276,13 @@ export default function SignupPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={<div className="min-h-[calc(100vh-64px)] flex items-center justify-center"><div className="animate-pulse text-slate-400">Loading...</div></div>}>
+            <SignupForm />
+        </Suspense>
     );
 }

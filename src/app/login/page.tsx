@@ -237,7 +237,7 @@ function LoginForm() {
 
                     {/* Sign up link */}
                     <Link
-                        href="/signup"
+                        href={redirect !== "/dashboard" ? `/signup?redirect=${encodeURIComponent(redirect)}` : "/signup"}
                         className="w-full flex items-center justify-center gap-2 bg-white text-slate-700 font-semibold py-3.5 px-8 rounded-xl border border-slate-200 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transform transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 shadow-sm hover:shadow-md"
                     >
                         Create a free account

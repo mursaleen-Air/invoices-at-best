@@ -2,8 +2,10 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useRouter, usePathname } from "next/navigation";
 import { DocumentFormData, DocumentType, DOCUMENT_CONFIG } from "@/types/invoice";
 import { getTemplate } from "@/lib/templates";
+import { createClient } from "@/lib/supabase/client";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
@@ -231,9 +233,12 @@ export default function DocumentPreview({
 }: DocumentPreviewProps) {
     const config = DOCUMENT_CONFIG[documentType];
     const template = getTemplate(templateId);
+    const router = useRouter();
+    const pathname = usePathname();
     const [positions, setPositions] = useState<Record<string, ElementPosition>>({});
     const [scale, setScale] = useState(1);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [showAuthPrompt, setShowAuthPrompt] = useState(false);
     const previewRef = useRef<HTMLDivElement>(null);
     const pageRef = useRef<HTMLDivElement>(null);
 
@@ -290,6 +295,22 @@ export default function DocumentPreview({
     // Generate PDF directly from the preview HTML — WYSIWYG
     const handleDownloadFromPreview = async () => {
         if (!pageRef.current || isGenerating) return;
+
+        // Auth gate: require sign-in before PDF download
+        try {
+            const supabase = createClient();
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                setShowAuthPrompt(true);
+                setTimeout(() => {
+                    router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+                }, 1500);
+                return;
+            }
+        } catch {
+            // If auth check fails, allow download as fallback
+        }
+
         setIsGenerating(true);
 
         try {
@@ -385,6 +406,27 @@ export default function DocumentPreview({
 
     return createPortal(
         <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex flex-col animate-fade-in">
+            {/* Auth Prompt Overlay */}
+            {showAuthPrompt && (
+                <div className="fixed inset-0 z-[10000] bg-black/70 backdrop-blur-md flex items-center justify-center animate-fade-in">
+                    <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl animate-fade-in-up">
+                        <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">Sign in to Download</h3>
+                        <p className="text-slate-600 text-sm mb-4">Create a free account to download your PDF. It only takes a few seconds.</p>
+                        <div className="flex items-center gap-2 justify-center text-sm text-indigo-600 font-medium">
+                            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            Redirecting to sign in...
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Toolbar */}
             <div className="bg-white/95 backdrop-blur-md border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
                 <div className="flex items-center gap-4">
