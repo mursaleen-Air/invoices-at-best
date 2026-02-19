@@ -27,7 +27,6 @@ export const metadata: Metadata = {
     description:
         "Create professional invoices, receipts, quotations & proforma invoices with live drag-and-drop preview. Download pixel-perfect WYSIWYG PDFs instantly. 6 free templates, no account required.",
     keywords: "invoice generator, free invoice, pdf invoice, receipt maker, quotation generator, proforma invoice, live preview, drag and drop editor, wysiwyg pdf, free invoice templates, billing software, online invoicing",
-    manifest: "/manifest.json",
 };
 
 export default function RootLayout({
